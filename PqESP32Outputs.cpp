@@ -19,24 +19,21 @@
 
 #include "PqESP32Outputs.h"
 
-SigmaDeltaOut::SigmaDeltaOut(uint8_t channel_, float freq_, uint8_t mode_)
-  : PqPutter(),
-    _channel(channel_),
-    _mode(mode_),
+uint8_t SigmaDeltaOut::_nextChannel = 0;
+
+SigmaDeltaOut::SigmaDeltaOut(uint8_t pin_, uint8_t mode_, float freq_)
+  : PqPinComponent(pin_, mode_), PqPutter(),
     _value(0),
     _freq(round(freq_))
 {
+  // Channels are only valid 0..7; after this it will stop working.
+  _channel = _nextChannel++;
 }
-
 
 void SigmaDeltaOut::attach(uint8_t pin)
 {
+  sigmaDeltaDetachPin(pin); // just to be sure
   sigmaDeltaAttachPin(pin, _channel);
-}
-
-void SigmaDeltaOut::detach(uint8_t pin)
-{
-  sigmaDeltaDetachPin(pin);
 }
 
 float SigmaDeltaOut::put(float value) {
@@ -58,4 +55,7 @@ void SigmaDeltaOut::setup() {
 
   // Initialize channel to 0.
   sigmaDeltaWrite(_channel, 0);
+
+  // Attach pin.
+  attach(_pin);
 }

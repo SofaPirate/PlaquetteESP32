@@ -14,7 +14,7 @@
 #include <PlaquetteESP32.h>
 
 // The LED.
-SigmaDeltaOut led;
+SigmaDeltaOut led(18);
 
 // The triangle/saw oscillator.
 /* NOTES:
@@ -25,7 +25,9 @@ SigmaDeltaOut led;
 TriOsc oscillator(5.0, 0.5); // period of 5 seconds, width of 50% (triangle)
 
 void begin() {
-  led.attach(18);
+  // NOTE: You can attach more than one output pin to the same channel: they
+  // will both follow the same behavior.
+  // led.attach(19);
 }
 
 void step() {

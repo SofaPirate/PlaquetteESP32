@@ -23,20 +23,17 @@
 #include <Plaquette.h>
 
 /// A generic class representing a simple PWM output.
-class SigmaDeltaOut : public PqPutter {
+class SigmaDeltaOut : public PqPinComponent, public PqPutter {
 public:
   /// Constructor.
-  SigmaDeltaOut(uint8_t channel=0, float freq=312500, uint8_t mode=SOURCE);
+  SigmaDeltaOut(uint8_t pin, uint8_t mode=SOURCE, float freq=312500);
   virtual ~SigmaDeltaOut() {}
 
   /**
-   * Attaches a pin on the ESP32 board to this output. This is normally
-   * done in the begin() function.
+   * Adds an extra pin attached to the same channel. Pin will simply copy
+   * the other pin.
    */
   void attach(uint8_t pin);
-
-  /// Detaches a pin on the ESP32 board to ALL outputs.
-  static void detach(uint8_t pin);
 
   /// Pushes value into the component and returns its (possibly filtered) value.
   virtual float put(float value);
@@ -53,9 +50,6 @@ public:
   /// Returns the channel this component is attached to.
   uint8_t channel() const { return _channel; }
 
-  /// Returns the mode of the component.
-  uint8_t mode() const { return _mode; }
-
   // Current value.
   float _value;
 
@@ -67,6 +61,9 @@ public:
 
   // The mode (varies according to context).
   uint8_t _mode;
+
+  // Internal use: automatically keeps track of channels.
+  static uint8_t _nextChannel;
 
   // Writes value to output and returns it.
   virtual float write(float value);
